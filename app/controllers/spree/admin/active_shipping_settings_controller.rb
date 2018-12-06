@@ -6,7 +6,7 @@ class Spree::Admin::ActiveShippingSettingsController < Spree::Admin::BaseControl
 #    @preferences_USPS = [:usps_login, :usps_commercial_base, :usps_commercial_plus]
 #    @preferences_CanadaPost = [:canada_post_login]
 #    @preferences_AustraliaPost = [:australia_post_login]
-#    @preferences_GeneralSettings = [:units, :unit_multiplier, :default_weight, :handling_fee,
+    @preferences_GeneralSettings = [:units, :unit_multiplier, :default_weight, :handling_fee,
 #      :max_weight_per_package, :test_mode]
     @preferences_CanadaPost = [:cp_customer_number, :cp_login, :cp_password]
     
