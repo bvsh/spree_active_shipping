@@ -100,8 +100,8 @@ module Spree
         def retrieve_rates(origin, destination, shipment_packages)
           begin
             puts('----------------------------------------------------------------')
-            puts(shipment_packages.kilograms)
-            response = carrier.find_rates(origin, destination, shipment_packages)
+            puts(shipment_packages.first.kilograms)
+            response = carrier.find_rates(origin, destination, shipment_packages.first)
             puts(response)
             puts('----------------------------------------------------------------')
             # turn this beastly array into a nice little hash
