@@ -108,7 +108,9 @@ module Spree
               service_name = rate.service_name.encode("UTF-8")
               [CGI.unescapeHTML(service_name), rate.price]
             end
+            puts(rates)
             rate_hash = Hash[*rates.flatten]
+            puts(rate_hash)
             return rate_hash
           rescue ::ActiveShipping::Error => e
 
