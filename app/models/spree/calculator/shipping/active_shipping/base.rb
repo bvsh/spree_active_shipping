@@ -109,7 +109,7 @@ module Spree
               puts("Package weight grams " + package.grams.to_s)
               combined_weight_gm += package.grams
 
-              puts(package.dimensions)
+              puts(package.cm)
               if max_cubed < (package.cm[0] * package.cm[1] * package.cm[2])
                 combined_dimension = package.cm
                 max_cubed = combined_dimension[0] * combined_dimension[1] * combined_dimension[2]
