@@ -27,14 +27,14 @@ module Spree
         end
 
         def compute_package(package)
-          package = ::ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
           order = package.order
           stock_location = package.stock_location
 
           origin = build_location(stock_location)
           destination = build_location(order.ship_address)
 
-          rates_result = retrieve_rates_from_cache(package, origin, destination)
+          active_package = ::ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
+          rates_result = retrieve_rates_from_cache(active_package, origin, destination)
 
           return nil if rates_result.kind_of?(Spree::ShippingError)
           return nil if rates_result.empty?
@@ -99,7 +99,8 @@ module Spree
 
         def retrieve_rates(origin, destination, shipment_packages)
           begin
-            response = carrier.find_rates(origin, destination, shipment_packages)
+            puts(shipment_packages)
+            response = carrier.find_rates(origin, destination, shipment_packages[0])
             # turn this beastly array into a nice little hash
             rates = response.rates.collect do |rate|
               service_name = rate.service_name.encode("UTF-8")
