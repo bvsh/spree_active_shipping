@@ -128,7 +128,7 @@ module Spree
               puts('----------------------------------------------------------------')
             end
 
-            combined_package = ::ActiveShipping::Package(combined_weight_gm, combined_dimensions, units: "metric")
+            combined_package = ::ActiveShipping::Package.new(combined_weight_gm, combined_dimensions, units: "metric")
             response = carrier.find_rates(origin, destination, combined_package)
             puts(response)
             puts('----------------------------------------------------------------')
