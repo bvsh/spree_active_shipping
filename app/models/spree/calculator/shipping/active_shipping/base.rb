@@ -101,9 +101,9 @@ module Spree
           begin
             puts('----------------------------------------------------------------')
             shipment_packages.each do |package|
-              puts("Package weight" + package.kilograms.to_s)
+              puts("Package weight " + package.kilograms.to_s)
               puts(package)
-              response = carrier.find_rates(origin, destination, shipment_packages.first)
+              response = carrier.find_rates(origin, destination, package)
             
               puts(response)
               rates = response.rates.collect do |rate|
