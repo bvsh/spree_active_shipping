@@ -1,7 +1,7 @@
 module Spree
     module Calculator::Shipping
         module CanadaPostPws
-            class CanadaPostPwsPp < Spree::Calculator::Shipping::CanadaPostPws::Base
+            class CanadaPostPwsPr < Spree::Calculator::Shipping::CanadaPostPws::Base
                 def self.description
                     "Canada Post PWS Priority"
                 end
