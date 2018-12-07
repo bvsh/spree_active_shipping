@@ -59,7 +59,7 @@ module Spree
                                      city: addr.city,
                                      zip: addr.zipcode)
           
-          logger.debug "Origin postal code {}, Destination postal code {}#{origin.zipcode, description.zipcode}"
+          # logger.debug "Origin postal code {}, Destination postal code {}#{origin.zipcode, description.zipcode}"
           timings_result = Rails.cache.fetch(cache_key(package)+"-timings") do
             retrieve_timings(origin, destination, packages(order))
           end
