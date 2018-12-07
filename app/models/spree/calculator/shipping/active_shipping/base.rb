@@ -103,7 +103,7 @@ module Spree
             puts('----------------------------------------------------------------')
             
             combined_weight_gm = 0
-            combined_dimension = {0, 0, 0}
+            combined_dimension = [0, 0, 0]
             max_cubed = 0
             shipment_packages.each do |package|
               puts("Package weight grams " + package.grams.to_s)
