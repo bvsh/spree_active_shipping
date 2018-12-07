@@ -1,7 +1,7 @@
 module Spree
     module Calculator::Shipping
         module CanadaPostPws
-            class CanadaPostPwsRP < Spree::Calculator::Shipping::CanadaPostPws::Base
+            class CanadaPostPwsRp < Spree::Calculator::Shipping::CanadaPostPws::Base
                 def self.description
                 "Canada Post PWS Regular Parcel"
                 end
