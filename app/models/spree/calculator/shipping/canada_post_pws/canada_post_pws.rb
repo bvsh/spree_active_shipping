@@ -12,9 +12,10 @@ module Spree
             api_key: Spree::ActiveShipping::Config[:cp_api_key],
             customer_number: Spree::ActiveShipping::Config[:cp_customer_number],
             secret: Spree::ActiveShipping::Config[:cp_secret],
+            test_mode: true
             # french: I18n.locale.to_sym.eql?(:fr)
           }
-          ::ActiveShipping::CanadaPostPws.new(canada_post_options)
+          ::ActiveShipping::CanadaPostPWS.new(canada_post_options)
         end
       end
     end
