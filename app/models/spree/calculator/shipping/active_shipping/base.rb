@@ -100,7 +100,9 @@ module Spree
         def retrieve_rates(origin, destination, shipment_packages)
           begin
             puts(shipment_packages)
-            response = carrier.find_rates(origin, destination, shipment_packages[0])
+            response = carrier.find_rates(origin, destination, shipment_packages)
+            puts(response)
+            puts('----------------------------------------------------------------')
             # turn this beastly array into a nice little hash
             rates = response.rates.collect do |rate|
               service_name = rate.service_name.encode("UTF-8")
