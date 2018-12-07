@@ -27,7 +27,7 @@ module Spree
         end
 
         def compute_package(package)
-          package = ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
+          package = ::ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
           order = package.order
           stock_location = package.stock_location
 
@@ -127,9 +127,7 @@ module Spree
             Rails.cache.write @cache_key, error #write error to cache to prevent constant re-lookups
             raise error
           end
-
         end
-
 
         def retrieve_timings(origin, destination, packages)
           begin
