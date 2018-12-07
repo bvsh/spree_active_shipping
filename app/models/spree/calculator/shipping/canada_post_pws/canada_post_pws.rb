@@ -3,9 +3,12 @@ require_dependency 'spree/calculator'
 module Spree
   module Calculator::Shipping
     module CanadaPostPws
-      class CanadaPostPws < Spree::Calculator::Shipping::ActiveShipping::Base
+      class Base < Spree::Calculator::Shipping::ActiveShipping::Base
         def self.description
-          "Canada Post PWS"
+          "Canada Post PWS base"
+        end
+        def self.cp_id
+          "Base"
         end
         def carrier
           canada_post_options = {
@@ -20,6 +23,42 @@ module Spree
           cp.endpoint = "https://ct.soa-gw.canadapost.ca/"
           cp.test_mode = true
           cp
+        end
+      end
+
+      class CanadaPostPwsEP < Spree::Calculator::Shipping::CanadaPostPws::Base
+        def self.description
+          "Canada Post PWS Expedited Parcel"
+        end
+        def self.cp_id
+          "Expedited Parcel"
+        end
+      end
+
+      class CanadaPostPwsPR < Spree::Calculator::Shipping::CanadaPostPws::Base
+        def self.description
+          "Canada Post PWS Priority"
+        end
+        def self.cp_id
+          "Priority"
+        end
+      end
+
+      class CanadaPostPwsRP < Spree::Calculator::Shipping::CanadaPostPws::Base
+        def self.description
+          "Canada Post PWS Regular Parcel"
+        end
+        def self.cp_id
+          "Regular Parcel"
+        end
+      end
+
+      class CanadaPostPwsEP < Spree::Calculator::Shipping::CanadaPostPws::Base
+        def self.description
+          "Canada Post PWS Express Post"
+        end
+        def self.cp_id
+          "Xpresspost"
         end
       end
     end
