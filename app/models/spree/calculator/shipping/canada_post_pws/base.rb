@@ -2,8 +2,11 @@ require_dependency 'spree/calculator'
 
 module Spree
   module Calculator::Shipping
-    module CanadaPostPws
+    module CanadaPostPWS
       class Base < Spree::Calculator::Shipping::ActiveShipping::Base
+        def self.description
+          "Canada Post PWS"
+        end
         def carrier
           canada_post_options = {
             api_key: Spree::ActiveShipping::Config[:cp_api_key],
