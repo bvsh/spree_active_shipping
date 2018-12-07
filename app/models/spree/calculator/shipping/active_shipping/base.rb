@@ -99,10 +99,21 @@ module Spree
 
         def retrieve_rates(origin, destination, shipment_packages)
           begin
+            puts('Combining packages')
             puts('----------------------------------------------------------------')
+            
+            combined_weight_gm = 0
+            combined_dimension = {0, 0, 0}
+            max_cubed = 0
             shipment_packages.each do |package|
-              puts("Package weight " + package.kilograms.to_s)
-              puts(package)
+              puts("Package weight grams " + package.grams.to_s)
+              combined_weight_gm += package.grams
+
+              puts(package.dimensions)
+              if max_cubed < (package.dimension[0] * package.dimension[1] * package.dimension[2])
+                combined_dimension = package.dimension
+                max_cubed = combined_dimension[0] * combined_dimension[1] * combined_dimension[2]
+              end 
               response = carrier.find_rates(origin, destination, package)
             
               puts(response)
