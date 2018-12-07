@@ -58,6 +58,8 @@ module Spree
                                      state: (addr.state ? addr.state.abbr : addr.state_name),
                                      city: addr.city,
                                      zip: addr.zipcode)
+          
+          logger.debug "Origin postal code {}, Destination postal code {}#{origin.zipcode, description.zipcode}"
           timings_result = Rails.cache.fetch(cache_key(package)+"-timings") do
             retrieve_timings(origin, destination, packages(order))
           end
