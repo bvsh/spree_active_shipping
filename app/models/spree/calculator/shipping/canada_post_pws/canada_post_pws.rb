@@ -15,7 +15,11 @@ module Spree
             # french: I18n.locale.to_sym.eql?(:fr)
             test_mode: true
           }
-          ::ActiveShipping::CanadaPostPWS.new(canada_post_options)
+          cp = ::ActiveShipping::CanadaPostPWS.new(canada_post_options)
+          # fix testmode and endpoint
+          cp.endpoint = "https://ct.soa-gw.canadapost.ca/"
+          cp.test_mode = true
+          cp
         end
       end
     end
