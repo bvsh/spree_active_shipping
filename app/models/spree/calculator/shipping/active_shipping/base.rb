@@ -100,6 +100,22 @@ module Spree
         def retrieve_rates(origin, destination, shipment_packages)
           begin
             puts('----------------------------------------------------------------')
+            shipment_packages.each do |package|
+              puts("Package weight" + package.kilograms)
+              puts(package)
+              response = carrier.find_rates(origin, destination, shipment_packages.first)
+            
+              puts(response)
+              rates = response.rates.collect do |rate|
+                service_name = rate.service_name.encode("UTF-8")
+                [CGI.unescapeHTML(service_name), rate.price]
+              end
+              puts(rates)
+              rate_hash = Hash[*rates.flatten]
+              puts(rate_hash)
+
+              puts('----------------------------------------------------------------')
+            end
             puts(shipment_packages.first.kilograms)
             response = carrier.find_rates(origin, destination, shipment_packages.first)
             puts(response)
