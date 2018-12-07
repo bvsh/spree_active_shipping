@@ -27,6 +27,7 @@ module Spree
         end
 
         def compute_package(package)
+          package = ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
           order = package.order
           stock_location = package.stock_location
 
