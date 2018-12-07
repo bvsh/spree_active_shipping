@@ -53,7 +53,7 @@ module Spree
         end
       end
 
-      class CanadaPostPwsEP < Spree::Calculator::Shipping::CanadaPostPws::Base
+      class CanadaPostPwsXP < Spree::Calculator::Shipping::CanadaPostPws::Base
         def self.description
           "Canada Post PWS Express Post"
         end
