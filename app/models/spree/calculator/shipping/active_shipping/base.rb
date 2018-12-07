@@ -99,7 +99,8 @@ module Spree
 
         def retrieve_rates(origin, destination, shipment_packages)
           begin
-            puts(shipment_packages)
+            puts('----------------------------------------------------------------')
+            puts(shipment_packages.kilograms)
             response = carrier.find_rates(origin, destination, shipment_packages)
             puts(response)
             puts('----------------------------------------------------------------')
