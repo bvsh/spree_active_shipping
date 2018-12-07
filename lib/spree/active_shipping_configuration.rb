@@ -14,12 +14,17 @@ class Spree::ActiveShippingConfiguration < Spree::Preferences::Configuration
   preference :usps_commercial_base, :boolean, default: false
   preference :usps_commercial_plus, :boolean, default: false
 
+  # TODO: outdated api, remove
   preference :canada_post_login, :string, default: "canada_post_login"
+
+  preference :cp_api_key, :string, default: "canada_pws_api_key"
+  preference :cp_secret, :string, default: "canada_pws_secret"
+  preference :cp_customer_number, :string, default: "canada_pws_customer_number"
 
   preference :australia_post_login, :string, default: "australia_post_api_key"
 
-  preference :units, :string, default: "imperial"
-  preference :unit_multiplier, :decimal, default: 16 # 16 oz./lb - assumes variant weights are in lbs
+  preference :units, :string, default: "metric"
+  preference :unit_multiplier, :decimal, default: 1000 # 16 oz./lb - assumes variant weights are in lbs
   preference :default_weight, :integer, default: 0 # 16 oz./lb - assumes variant weights are in lbs
   preference :handling_fee, :integer
   preference :max_weight_per_package, :integer, default: 0 # 0 means no limit

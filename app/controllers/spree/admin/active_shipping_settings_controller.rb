@@ -8,7 +8,7 @@ class Spree::Admin::ActiveShippingSettingsController < Spree::Admin::BaseControl
 #    @preferences_AustraliaPost = [:australia_post_login]
     @preferences_GeneralSettings = [:units, :unit_multiplier, :default_weight, :handling_fee,
 #      :max_weight_per_package, :test_mode]
-    @preferences_CanadaPost = [:cp_customer_number, :cp_login, :cp_password]
+    @preferences_CanadaPost = [:cp_customer_number, :cp_api_key, :cp_secret]
     
     @config = Spree::ActiveShippingConfiguration.new
   end
