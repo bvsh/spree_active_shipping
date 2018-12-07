@@ -5,7 +5,7 @@ module Spree
     module CanadaPostPws
       class Base < Spree::Calculator::Shipping::ActiveShipping::Base
         def self.description
-          "Canada Post PWS base"
+          nil
         end
         def self.cp_id
           "Base"
@@ -26,41 +26,41 @@ module Spree
         end
       end
 
-      class CanadaPostPwsEP < Spree::Calculator::Shipping::CanadaPostPws::Base
-        def self.description
-          "Canada Post PWS Expedited Parcel"
-        end
-        def self.cp_id
-          "Expedited Parcel"
-        end
-      end
+      # class CanadaPostPwsEP < Spree::Calculator::Shipping::CanadaPostPws::Base
+      #   def self.description
+      #     "Canada Post PWS Expedited Parcel"
+      #   end
+      #   def self.cp_id
+      #     "Expedited Parcel"
+      #   end
+      # end
 
-      class CanadaPostPwsPR < Spree::Calculator::Shipping::CanadaPostPws::Base
-        def self.description
-          "Canada Post PWS Priority"
-        end
-        def self.cp_id
-          "Priority"
-        end
-      end
+      # class CanadaPostPwsPR < Spree::Calculator::Shipping::CanadaPostPws::Base
+      #   def self.description
+      #     "Canada Post PWS Priority"
+      #   end
+      #   def self.cp_id
+      #     "Priority"
+      #   end
+      # end
 
-      class CanadaPostPwsRP < Spree::Calculator::Shipping::CanadaPostPws::Base
-        def self.description
-          "Canada Post PWS Regular Parcel"
-        end
-        def self.cp_id
-          "Regular Parcel"
-        end
-      end
+      # class CanadaPostPwsRP < Spree::Calculator::Shipping::CanadaPostPws::Base
+      #   def self.description
+      #     "Canada Post PWS Regular Parcel"
+      #   end
+      #   def self.cp_id
+      #     "Regular Parcel"
+      #   end
+      # end
 
-      class CanadaPostPwsXP < Spree::Calculator::Shipping::CanadaPostPws::Base
-        def self.description
-          "Canada Post PWS Express Post"
-        end
-        def self.cp_id
-          "Xpresspost"
-        end
-      end
+      # class CanadaPostPwsXP < Spree::Calculator::Shipping::CanadaPostPws::Base
+      #   def self.description
+      #     "Canada Post PWS Express Post"
+      #   end
+      #   def self.cp_id
+      #     "Xpresspost"
+      #   end
+      # end
     end
   end
 end
