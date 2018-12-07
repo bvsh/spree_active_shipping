@@ -2,8 +2,8 @@ require_dependency 'spree/calculator'
 
 module Spree
   module Calculator::Shipping
-    module CanadaPostPWS
-      class Base < Spree::Calculator::Shipping::ActiveShipping::Base
+    module CanadaPostPws
+      class CanadaPostPws < Spree::Calculator::Shipping::ActiveShipping::Base
         def self.description
           "Canada Post PWS"
         end
