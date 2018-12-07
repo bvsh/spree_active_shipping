@@ -111,24 +111,25 @@ module Spree
 
               puts(package.cm)
               if max_cubed < (package.cm[0] * package.cm[1] * package.cm[2])
-                combined_dimension = package.cm
-                max_cubed = combined_dimension[0] * combined_dimension[1] * combined_dimension[2]
+                combined_dimensions = package.cm
+                max_cubed = combined_dimensions[0] * combined_dimensions[1] * combined_dimensions[2]
               end 
-              response = carrier.find_rates(origin, destination, package)
+              # response = carrier.find_rates(origin, destination, package)
             
-              puts(response)
-              rates = response.rates.collect do |rate|
-                service_name = rate.service_name.encode("UTF-8")
-                [CGI.unescapeHTML(service_name), rate.price]
-              end
-              puts(rates)
-              rate_hash = Hash[*rates.flatten]
-              puts(rate_hash)
+              # puts(response)
+              # rates = response.rates.collect do |rate|
+              #   service_name = rate.service_name.encode("UTF-8")
+              #   [CGI.unescapeHTML(service_name), rate.price]
+              # end
+              # puts(rates)
+              # rate_hash = Hash[*rates.flatten]
+              # puts(rate_hash)
 
               puts('----------------------------------------------------------------')
             end
-            puts(shipment_packages.first.kilograms)
-            response = carrier.find_rates(origin, destination, shipment_packages.first)
+
+            combined_package = ::ActiveShipping::Package(combined_weight_gm, combined_dimensions, units: "metric")
+            response = carrier.find_rates(origin, destination, combined_package)
             puts(response)
             puts('----------------------------------------------------------------')
             # turn this beastly array into a nice little hash
