@@ -24,7 +24,7 @@ class Spree::ActiveShippingConfiguration < Spree::Preferences::Configuration
   preference :australia_post_login, :string, default: "australia_post_api_key"
 
   preference :units, :string, default: "metric"
-  preference :unit_multiplier, :decimal, default: 1000 # 16 oz./lb - assumes variant weights are in lbs
+  preference :unit_multiplier, :decimal, default: 10 # 16 oz./lb - assumes variant weights are in lbs
   preference :default_weight, :integer, default: 0 # 16 oz./lb - assumes variant weights are in lbs
   preference :handling_fee, :integer
   preference :max_weight_per_package, :integer, default: 0 # 0 means no limit
