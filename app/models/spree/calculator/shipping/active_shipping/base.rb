@@ -34,7 +34,7 @@ module Spree
           destination = build_location(order.ship_address)
 
           #active_package = ::ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
-          rates_result = retrieve_rates_from_cache(package, origin, destination)
+          rates_result, combined_package = retrieve_rates_from_cache(package, origin, destination)
 
           return nil if rates_result.kind_of?(Spree::ShippingError)
           return nil if rates_result.empty?
@@ -44,7 +44,7 @@ module Spree
           rate = rate.to_f + (Spree::ActiveShipping::Config[:handling_fee].to_f || 0.0)
 
           # divide by 100 since active_shipping rates are expressed as cents
-          return rate/100.0
+          return rate/100.0, combined_package
         end
 
         def timing(line_items)
@@ -140,7 +140,7 @@ module Spree
             puts(rates)
             rate_hash = Hash[*rates.flatten]
             puts(rate_hash)
-            return rate_hash
+            return rate_hash, combined_package
           rescue ::ActiveShipping::Error => e
 
             if e.class == ::ActiveShipping::ResponseError && e.response.is_a?(::ActiveShipping::Response)

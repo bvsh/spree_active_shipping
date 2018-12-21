@@ -16,12 +16,14 @@ module Spree
             customer_number: Spree::ActiveShipping::Config[:cp_customer_number],
             secret: Spree::ActiveShipping::Config[:cp_secret],
             # french: I18n.locale.to_sym.eql?(:fr)
-            test_mode: true
+            test_mode: Spree::ActiveShipping::Config[:test_mode]
           }
           cp = ::ActiveShipping::CanadaPostPWS.new(canada_post_options)
           # fix testmode and endpoint
-          cp.endpoint = "https://ct.soa-gw.canadapost.ca/"
-          cp.test_mode = true
+          unless not Spree::ActiveShipping::Config[:test_mode]
+            cp.endpoint = "https://ct.soa-gw.canadapost.ca/"
+            cp.test_mode = true
+          end
           cp
         end
       end
