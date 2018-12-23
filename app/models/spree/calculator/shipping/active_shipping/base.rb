@@ -20,7 +20,6 @@ module Spree
           # if rates are avaiable for this service
           # before calling the carrier for rates
           is_package_shippable?(package)
-
           !compute(package).nil?
         rescue Spree::ShippingError
           false
@@ -32,10 +31,7 @@ module Spree
 
           origin = build_location(stock_location)
           destination = build_location(order.ship_address)
-
-          #active_package = ::ActiveShipping::Package.new(package.weight, [package.width, package.length, package.height], :units => :metric)
-          rates_result, combined_package = retrieve_rates_from_cache(package, origin, destination)
-
+          rates_result = retrieve_rates_from_cache(package, origin, destination)
           return nil if rates_result.kind_of?(Spree::ShippingError)
           return nil if rates_result.empty?
           rate = rates_result[self.class.cp_id]
@@ -44,7 +40,7 @@ module Spree
           rate = rate.to_f + (Spree::ActiveShipping::Config[:handling_fee].to_f || 0.0)
 
           # divide by 100 since active_shipping rates are expressed as cents
-          return rate/100.0, combined_package
+          return rate/100.0
         end
 
         def timing(line_items)
@@ -98,49 +94,28 @@ module Spree
         end
 
         def retrieve_rates(origin, destination, shipment_packages)
+          rate_hash = {}
           begin
-            puts('Combining packages')
-            puts('----------------------------------------------------------------')
-            
-            combined_weight_gm = 0
-            combined_dimensions = [0, 0, 0]
-            max_cubed = 0
-            shipment_packages.each do |package|
-              puts("Package weight grams " + package.grams.to_s)
-              combined_weight_gm += package.grams
+            shipment_packages.each do | shipment_package |
+              response = carrier.find_rates(origin, destination, shipment_package)
+              puts(response)
+              rates = response.rates.collect do |rate|
+                service_name = rate.service_name.encode("UTF-8")
+                [CGI.unescapeHTML(service_name), rate.price]
+              end
+              puts(rates)
 
-              puts(package.cm)
-              if max_cubed < (package.cm[0] * package.cm[1] * package.cm[2])
-                combined_dimensions = package.cm
-                max_cubed = combined_dimensions[0] * combined_dimensions[1] * combined_dimensions[2]
-              end 
-              # response = carrier.find_rates(origin, destination, package)
-            
-              # puts(response)
-              # rates = response.rates.collect do |rate|
-              #   service_name = rate.service_name.encode("UTF-8")
-              #   [CGI.unescapeHTML(service_name), rate.price]
-              # end
-              # puts(rates)
-              # rate_hash = Hash[*rates.flatten]
-              # puts(rate_hash)
-
-              puts('----------------------------------------------------------------')
+              rates = Hash[*rates.flatten]
+              rates.merge(rate_hash){ |k, a_value, b_value| a_value + b_value }
+              rate_hash = rates
             end
 
-            combined_package = ::ActiveShipping::Package.new(combined_weight_gm, combined_dimensions, units: "metric")
-            response = carrier.find_rates(origin, destination, combined_package)
-            puts(response)
-            puts('----------------------------------------------------------------')
-            # turn this beastly array into a nice little hash
-            rates = response.rates.collect do |rate|
-              service_name = rate.service_name.encode("UTF-8")
-              [CGI.unescapeHTML(service_name), rate.price]
-            end
-            puts(rates)
-            rate_hash = Hash[*rates.flatten]
+            puts("------------------------")
+            puts("Merged")
             puts(rate_hash)
-            return rate_hash, combined_package
+
+            return rate_hash
+
           rescue ::ActiveShipping::Error => e
 
             if e.class == ::ActiveShipping::ResponseError && e.response.is_a?(::ActiveShipping::Response)
@@ -187,48 +162,84 @@ module Spree
           end
         end
 
-        def convert_package_to_weights_array(package)
-          multiplier = Spree::ActiveShipping::Config[:unit_multiplier]
-          default_weight = Spree::ActiveShipping::Config[:default_weight]
-          max_weight = get_max_weight(package)
+        # def convert_package_to_weights_array(package)
+        #   multiplier = Spree::ActiveShipping::Config[:unit_multiplier]
+        #   default_weight = Spree::ActiveShipping::Config[:default_weight]
+        #   max_weight = get_max_weight(package)
 
-          weights = package.contents.map do |content_item|
-            item_weight = content_item.variant.weight.to_f
-            item_weight = default_weight if item_weight <= 0
-            item_weight *= multiplier
+        #   weights = package.contents.map do |content_item|
+        #     item_weight = content_item.variant.weight.to_f
+        #     item_weight = default_weight if item_weight <= 0
+        #     item_weight *= multiplier
 
-            if max_weight <= 0 || item_weight < max_weight
-              item_weight
-            else
-              raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")  
-            end
-          end
-          weights.flatten.compact.sort
-        end
+        #     if max_weight <= 0 || item_weight < max_weight
+        #       item_weight
+        #     else
+        #       raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")  
+        #     end
+        #   end
+        #   weights.flatten.compact.sort
+        # end
 
-        def convert_package_to_item_packages_array(package)
-          multiplier = Spree::ActiveShipping::Config[:unit_multiplier]
-          max_weight = get_max_weight(package)
-          packages = []
+        # def convert_package_to_item_packages_array(package)
+        #   multiplier = Spree::ActiveShipping::Config[:unit_multiplier]
+        #   max_weight = get_max_weight(package)
+        #   packages = []
 
-          package.contents.each do |content_item|
-            variant  = content_item.variant
-            quantity = content_item.quantity
-            product  = variant.product
+        #   shipping_package = {
+        #     weight: 0,
+        #     length: 0,
+        #     width: 0,
+        #     height: 0
+        #   }
 
-            product.product_packages.each do |product_package|
-              if product_package.weight.to_f <= max_weight or max_weight == 0
-                quantity.times do
-                  packages << [product_package.weight * multiplier, product_package.length, product_package.width, product_package.height]
-                end
-              else
-                raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")
-              end
-            end
-          end
+        #   package.contents.each do |content_item|
+        #     variant  = content_item.variant
+        #     quantity = content_item.quantity
+        #     product  = variant.product
 
-          packages
-        end
+        #     weight = product.weight * multiplier
+
+        #     if weight > max_weight
+        #       raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")
+        #     end
+        #     if shipping_package[:weight] + weight <= max_weight || max_weight == 0
+        #       # add item to box
+        #       shipping_package[:weight] += weight
+        #       shipping_package[:length] += product.depth
+        #       shipping_package[:width] += product.width
+        #       shipping_package[:height] += product.height
+        #     else
+        #       # start new box
+        #       packages << [
+        #         shipping_package[:weight],
+        #         shipping_package[:length],
+        #         shipping_package[:width],
+        #         shipping_package[:height]
+        #       ]
+        #       shipping_package = {
+        #         weight: 0,
+        #         length: 0,
+        #         width: 0,
+        #         height: 0
+        #       }
+        #     end
+
+        #     # ignore product_packages for now
+        #     # product.product_packages.each do |product_package|
+        #     #   # pack shipping boxes
+        #     #   if product_package.weight.to_f <= max_weight or max_weight == 0
+        #     #     quantity.times do
+        #     #       packages << [product_package.weight * multiplier, product_package.length, product_package.width, product_package.height]
+        #     #     end
+        #     #   else
+        #     #     raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")
+        #     #   end
+        #     # end
+        #   end
+
+        #   packages
+        # end
 
         # Used for calculating Dimensional Weight pricing.
         # Override in your own extensions to compute package dimensions,
@@ -240,30 +251,64 @@ module Spree
 
         # Generates an array of Package objects based on the quantities and weights of the variants in the line items
         def packages(package)
+          xboxsize = [30, 24, 24]
+          multiplier = Spree::ActiveShipping::Config[:unit_multiplier]
+          max_weight = get_max_weight(package)
           units = Spree::ActiveShipping::Config[:units].to_sym
           packages = []
-          weights = convert_package_to_weights_array(package)
-          max_weight = get_max_weight(package)
-          dimensions = convert_package_to_dimensions_array(package)
-          item_specific_packages = convert_package_to_item_packages_array(package)
 
-          if max_weight <= 0
-            packages << ::ActiveShipping::Package.new(weights.sum, dimensions, units: units)
-          else
-            package_weight = 0
-            weights.each do |content_weight|
-              if package_weight + content_weight <= max_weight
-                package_weight += content_weight
-              else
-                packages << ::ActiveShipping::Package.new(package_weight, dimensions, units: units)
-                package_weight = content_weight
-              end
+          shipping_package = {
+            weight: 0,
+            length: 0,
+            width: 0,
+            height: 0
+          }
+
+          package.contents.each do |content_item|
+            variant  = content_item.variant
+            quantity = content_item.quantity
+            product  = variant.product
+
+            weight = product.weight * multiplier
+
+            if weight > max_weight && max_weight != 0
+              raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} #{units}.")
             end
-            packages << ::ActiveShipping::Package.new(package_weight, dimensions, units: units) if package_weight > 0
-          end
+            if shipping_package[:weight] + weight <= max_weight || max_weight == 0
+              # add item to box
+              shipping_package[:weight] += weight
+              shipping_package[:length] += product.depth
+              shipping_package[:width] += product.width
+              shipping_package[:height] += product.height
+            else
+              # start new box
+              packages << ::ActiveShipping::Package.new(
+                shipping_package[:weight],
+                xboxsize,
+                # [shipping_package[:length],
+                # shipping_package[:width],
+                # shipping_package[:height]],
+                units: units
+              )
+              shipping_package = {
+                weight: 0,
+                length: 0,
+                width: 0,
+                height: 0
+              }
 
-          item_specific_packages.each do |package|
-            packages << ::ActiveShipping::Package.new(package.at(0), [package.at(1), package.at(2), package.at(3)], units: units)
+            end
+          end
+          if shipping_package[:weight] > 0
+            # add last box
+            packages << ::ActiveShipping::Package.new(
+              shipping_package[:weight],
+              xboxsize,
+              # [shipping_package[:length],
+              # shipping_package[:width],
+              # shipping_package[:height]],
+              units: units
+            )
           end
 
           packages
